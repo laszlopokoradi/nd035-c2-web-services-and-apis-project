@@ -1,26 +1,20 @@
 package com.udacity.vehicles.api;
 
+
+import com.udacity.vehicles.domain.car.*;
+import com.udacity.vehicles.service.*;
+import jakarta.validation.*;
+import org.springframework.hateoas.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.*;
+
+import java.net.*;
+import java.util.*;
+import java.util.stream.*;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-import com.udacity.vehicles.domain.car.Car;
-import com.udacity.vehicles.service.CarService;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
-import jakarta.validation.Valid;
 
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Implements a REST-based controller for the Vehicles API.
@@ -39,84 +33,101 @@ class CarController {
 
     /**
      * Creates a list to store any vehicles.
+     *
      * @return list of vehicles
      */
     @GetMapping
     CollectionModel<EntityModel<Car>> list() {
-        List<EntityModel<Car>> resources = carService.list().stream().map(assembler::toModel)
-                .collect(Collectors.toList());
-        return CollectionModel.of(resources,
-                linkTo(methodOn(CarController.class).list()).withSelfRel());
+        List<EntityModel<Car>> resources = carService.list().stream().map(assembler::toModel).collect(Collectors.toList());
+        return CollectionModel.of(resources, linkTo(methodOn(CarController.class).list()).withSelfRel());
     }
 
     /**
      * Gets information of a specific car by ID.
+     *
      * @param id the id number of the given vehicle
      * @return all information for the requested vehicle
      */
     @GetMapping("/{id}")
     EntityModel<Car> get(@PathVariable Long id) {
-        /**
-         * TODO: Use the `findById` method from the Car Service to get car information.
-         * TODO: Use the `assembler` on that car and return the resulting output.
-         *   Update the first line as part of the above implementing.
-         */
-        return assembler.toModel(new Car());
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID cannot be null");
+        }
+
+        Car car = this.carService.findById(id);
+
+        if (car == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found");
+        }
+
+        return assembler.toModel(car);
     }
 
     /**
      * Posts information to create a new vehicle in the system.
+     *
      * @param car A new vehicle to add to the system.
      * @return response that the new vehicle was added to the system
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
     ResponseEntity<?> post(@Valid @RequestBody Car car) throws URISyntaxException {
-        /**
-         * TODO: Use the `save` method from the Car Service to save the input car.
-         * TODO: Use the `assembler` on that saved car and return as part of the response.
-         *   Update the first line as part of the above implementing.
-         */
+        if (car == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car cannot be null");
+        }
 
         Car newCar = this.carService.save(car);
 
+        if (newCar == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Car could not be created");
+        }
+
         EntityModel<Car> resource = assembler.toModel(newCar);
 
-
         //Note: There will be error on this line till above TODOs are implemented
-        return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
-
-        
+        return ResponseEntity.created(linkTo(methodOn(CarController.class).get(newCar.getId())).toUri()).body(resource);
     }
 
     /**
      * Updates the information of a vehicle in the system.
-     * @param id The ID number for which to update vehicle information.
+     *
+     * @param id  The ID number for which to update vehicle information.
      * @param car The updated information about the related vehicle.
      * @return response that the vehicle was updated in the system
      */
     @PutMapping("/{id}")
     ResponseEntity<?> put(@PathVariable Long id, @Valid @RequestBody Car car) {
-        /**
-         * TODO: Set the id of the input car object to the `id` input.
-         * TODO: Save the car using the `save` method from the Car service
-         * TODO: Use the `assembler` on that updated car and return as part of the response.
-         *   Update the first line as part of the above implementing.
-         */
-        EntityModel<Car> resource = assembler.toModel(new Car());
+        if (id == null || car == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID and Car cannot be null");
+        }
+
+        car.setId(id);
+
+        Car updatedCar = this.carService.save(car);
+
+        if (updatedCar == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Car could not be updated");
+        }
+
+        EntityModel<Car> resource = assembler.toModel(updatedCar);
         return ResponseEntity.ok(resource);
     }
 
     /**
      * Removes a vehicle from the system.
+     *
      * @param id The ID number of the vehicle to remove.
      * @return response that the related vehicle is no longer in the system
      */
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable Long id) {
-        /**
-         * TODO: Use the Car Service to delete the requested vehicle.
-         */
+
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID cannot be null");
+        }
+
+        this.carService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 }

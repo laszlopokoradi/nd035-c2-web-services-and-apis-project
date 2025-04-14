@@ -3,10 +3,12 @@ package com.udacity.vehicles.service;
 import com.udacity.vehicles.client.maps.*;
 import com.udacity.vehicles.client.prices.*;
 import com.udacity.vehicles.domain.*;
-import com.udacity.vehicles.domain.car.Car;
-import com.udacity.vehicles.domain.car.CarRepository;
-import java.util.List;
-import org.springframework.stereotype.Service;
+import com.udacity.vehicles.domain.car.*;
+import org.springframework.stereotype.*;
+
+import java.util.*;
+
+;
 
 /**
  * Implements the car service create, read, update or delete
@@ -28,6 +30,7 @@ public class CarService {
 
     /**
      * Gathers a list of all vehicles
+     *
      * @return a list of all vehicles in the CarRepository
      */
     public List<Car> list() {
@@ -36,6 +39,7 @@ public class CarService {
 
     /**
      * Gets car information by ID (or throws exception if non-existent)
+     *
      * @param id the ID number of the car to gather information on
      * @return the requested car's information, including location and price
      */
@@ -55,6 +59,7 @@ public class CarService {
 
     /**
      * Either creates or updates a vehicle, based on prior existence of car
+     *
      * @param car A car object, which can be either new or existing
      * @return the new/updated car is stored in the repository
      */
@@ -73,27 +78,15 @@ public class CarService {
 
     /**
      * Deletes a given car by ID
+     *
      * @param id the ID number of the car to delete
      */
     public void delete(Long id) {
         this.repository.findById(id)
-                                 .orElseThrow(CarNotFoundException::new);
+                .orElseThrow(CarNotFoundException::new);
 
         this.pricingClient.deletePriceOfCar(id);
 
         this.repository.deleteById(id);
-
-
-        /**
-         * TODO: Find the car by ID from the `repository` if it exists.
-         *   If it does not exist, throw a CarNotFoundException
-         */
-
-
-        /**
-         * TODO: Delete the car from the repository.
-         */
-
-
     }
 }

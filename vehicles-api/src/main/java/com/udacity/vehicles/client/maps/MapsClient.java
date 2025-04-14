@@ -1,12 +1,14 @@
 package com.udacity.vehicles.client.maps;
 
-import com.udacity.vehicles.domain.Location;
-import java.util.Objects;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import com.udacity.vehicles.domain.*;
+import org.modelmapper.*;
+import org.slf4j.*;
+import org.springframework.cloud.client.*;
+import org.springframework.cloud.client.discovery.*;
+import org.springframework.stereotype.*;
+import org.springframework.web.client.*;
+
+import java.util.*;
 
 /**
  * Implements a class to interface with the Maps Client for location data.
@@ -16,24 +18,28 @@ public class MapsClient {
 
     private static final Logger log = LoggerFactory.getLogger(MapsClient.class);
 
-    private final WebClient client;
+    private final DiscoveryClient discoveryClient;
+    private final RestClient restClient;
     private final ModelMapper mapper;
 
-    public MapsClient(WebClient maps,
-            ModelMapper mapper) {
-        this.client = maps;
+    public MapsClient(DiscoveryClient discoveryClient, RestClient.Builder restClientBuilder, ModelMapper mapper) {
+        this.discoveryClient = discoveryClient;
+        this.restClient = restClientBuilder.build();
         this.mapper = mapper;
     }
 
     /**
      * Gets an address from the Maps client, given latitude and longitude.
+     *
      * @param location An object containing "lat" and "lon" of location
      * @return An updated location including street, city, state and zip,
-     *   or an exception message noting the Maps service is down
+     * or an exception message noting the Maps service is down
      */
     public Location getAddress(Location location) {
+        ServiceInstance pricingService = discoveryClient.getInstances("boogle-maps").get(0);
+
         try {
-            Address address = client
+            Address address = this.restClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/maps/")
@@ -41,7 +47,7 @@ public class MapsClient {
                             .queryParam("lon", location.getLon())
                             .build()
                     )
-                    .retrieve().bodyToMono(Address.class).block();
+                    .retrieve().body(Address.class);
 
             mapper.map(Objects.requireNonNull(address), location);
 
