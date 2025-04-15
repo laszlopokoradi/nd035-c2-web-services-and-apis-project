@@ -1,5 +1,7 @@
 package com.udacity.boogle.maps;
 
+import com.udacity.boogle.maps.domain.*;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
@@ -15,7 +17,6 @@ class MockAddressRepository {
      * @return A new, random address split into street, city, state and zip
      */
     static Address getRandom() {
-
         Random generator = new Random();
         int randomIndex = generator.nextInt(ADDRESSES.length);
 

@@ -34,7 +34,18 @@ public class CarService {
      * @return a list of all vehicles in the CarRepository
      */
     public List<Car> list() {
-        return repository.findAll();
+        List<Car> allCars = repository.findAll();
+
+        for (Car car : allCars) {
+            String price = this.pricingClient.getPrice(car.getId());
+            car.setPrice(price);
+
+            Location location = car.getLocation();
+            car.setLocation(location);
+            // Note: The Location class file also uses @transient for the address, meaning the Maps service needs to be called each time for the address.
+        }
+
+        return allCars;
     }
 
     /**

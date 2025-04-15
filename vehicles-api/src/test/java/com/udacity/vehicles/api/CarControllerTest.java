@@ -93,6 +93,12 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
+        mvc.perform(post(new URI("/cars")).content(json.write(car)
+                                                       .getJson())
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isCreated());
+
         mvc.perform(get(new URI("/cars")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.carList[0].details.manufacturer.name").value("Chevrolet"))
@@ -131,11 +137,18 @@ public class CarControllerTest {
     @Test
     public void deleteCar()
             throws Exception {
-        /**
-         * TODO: Add a test to check whether a vehicle is appropriately deleted
-         *   when the `delete` method is called from the Car Controller. This
-         *   should utilize the car from `getCar()` below.
-         */
+        Car car = getCar();
+
+        mvc.perform(post(new URI("/cars")).content(json.write(car)
+                                                       .getJson())
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isCreated());
+
+        mvc.perform(delete(new URI("/cars/1"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 
     /**

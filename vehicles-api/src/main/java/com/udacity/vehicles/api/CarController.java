@@ -71,7 +71,7 @@ class CarController {
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
-    ResponseEntity<?> post(@Valid @RequestBody Car car) throws URISyntaxException {
+    ResponseEntity<EntityModel<Car>> post(@Valid @RequestBody Car car) throws URISyntaxException {
         if (car == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car cannot be null");
         }
@@ -96,7 +96,7 @@ class CarController {
      * @return response that the vehicle was updated in the system
      */
     @PutMapping("/{id}")
-    ResponseEntity<?> put(@PathVariable Long id, @Valid @RequestBody Car car) {
+    ResponseEntity<EntityModel<Car>> put(@PathVariable Long id, @Valid @RequestBody Car car) {
         if (id == null || car == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID and Car cannot be null");
         }
