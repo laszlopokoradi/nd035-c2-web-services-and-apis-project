@@ -36,7 +36,7 @@ public class PricingClient {
      * @return Currency and price of the requested vehicle, error message that the vehicle ID is invalid, or note that the service is down.
      */
     public String getPrice(Long vehicleId) {
-        ServiceInstance pricingService = discoveryClient.getInstances("pricing-service").get(0);
+        ServiceInstance pricingService = discoveryClient.getInstances("pricing-service").getFirst();
         try {
             Price price = restClient
                     .get()

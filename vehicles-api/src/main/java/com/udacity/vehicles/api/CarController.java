@@ -71,7 +71,7 @@ class CarController {
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
-    ResponseEntity<EntityModel<Car>> post(@Valid @RequestBody Car car) throws URISyntaxException {
+    ResponseEntity<EntityModel<Car>> post(@Valid @RequestBody Car car) {
         if (car == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car cannot be null");
         }

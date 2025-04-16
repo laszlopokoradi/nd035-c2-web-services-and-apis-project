@@ -36,13 +36,13 @@ public class MapsClient {
      * or an exception message noting the Maps service is down
      */
     public Location getAddress(Location location) {
-        ServiceInstance pricingService = discoveryClient.getInstances("boogle-maps").get(0);
+        ServiceInstance boogleMapsService = discoveryClient.getInstances("boogle-maps").getFirst();
 
         try {
             Address address = this.restClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/maps/")
+                            .path(boogleMapsService.getUri().toString() + "/maps/")
                             .queryParam("lat", location.getLat())
                             .queryParam("lon", location.getLon())
                             .build()

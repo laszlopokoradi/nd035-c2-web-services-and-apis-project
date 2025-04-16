@@ -75,6 +75,14 @@ public class CarService {
      * @return the new/updated car is stored in the repository
      */
     public Car save(Car car) {
+        if (car == null) {
+            throw new IllegalArgumentException("Car cannot be null");
+        }
+
+        if (car.getId() == null) {
+            // The car is new, so we need to set the price
+        }
+
         if (car.getId() != null) {
             return repository.findById(car.getId())
                     .map(carToBeUpdated -> {
