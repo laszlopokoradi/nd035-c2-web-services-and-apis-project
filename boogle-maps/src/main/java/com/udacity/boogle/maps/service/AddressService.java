@@ -1,27 +1,26 @@
-package com.udacity.boogle.maps;
+package com.udacity.boogle.maps.service;
 
 import com.udacity.boogle.maps.domain.*;
+import org.springframework.stereotype.*;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
-/**
- * Implements a mock repository for generating a random address.
- */
-class MockAddressRepository {
+@Service
+public class AddressService {
+    private final Random generator = new Random();
 
-    /**
-     * Gets a random address from the list.
-     * @return A new, random address split into street, city, state and zip
-     */
-    static Address getRandom() {
-        Random generator = new Random();
+    public String getRandomString() {
         int randomIndex = generator.nextInt(ADDRESSES.length);
 
-        String address = ADDRESSES[randomIndex];
+        return ADDRESSES[randomIndex];
+    }
 
+    public Address getRandomAddress() {
+        return toAddress(getRandomString());
+    }
+
+    public Address toAddress(String address) {
         String[] addressParts = address.split(",");
         String streetAndNumber = addressParts[0];
         String cityStateAndZip = addressParts[1];
@@ -39,9 +38,6 @@ class MockAddressRepository {
         return new Address(streetAndNumber, city, state, zip);
     }
 
-    /**
-     * An array of random addresses for use in getRandom()
-     */
     private static final String[] ADDRESSES = {
             "777 Brockton Avenue, Abington MA 2351",
             "30 Memorial Drive, Avon MA 2322",
