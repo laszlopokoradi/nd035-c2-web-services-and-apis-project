@@ -11,7 +11,6 @@ import org.springframework.web.server.*;
 
 import java.net.*;
 import java.util.*;
-import java.util.stream.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -38,7 +37,7 @@ class CarController {
      */
     @GetMapping
     CollectionModel<EntityModel<Car>> list() {
-        List<EntityModel<Car>> resources = carService.list().stream().map(assembler::toModel).collect(Collectors.toList());
+        List<EntityModel<Car>> resources = carService.list().stream().map(assembler::toModel).toList();
         return CollectionModel.of(resources, linkTo(methodOn(CarController.class).list()).withSelfRel());
     }
 
@@ -68,7 +67,6 @@ class CarController {
      *
      * @param car A new vehicle to add to the system.
      * @return response that the new vehicle was added to the system
-     * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
     ResponseEntity<EntityModel<Car>> post(@Valid @RequestBody Car car) {
@@ -84,7 +82,6 @@ class CarController {
 
         EntityModel<Car> resource = assembler.toModel(newCar);
 
-        //Note: There will be error on this line till above TODOs are implemented
         return ResponseEntity.created(linkTo(methodOn(CarController.class).get(newCar.getId())).toUri()).body(resource);
     }
 
@@ -101,7 +98,17 @@ class CarController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID and Car cannot be null");
         }
 
-        car.setId(id);
+        if (car.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Car ID cannot be null, use POST to create a new car");
+        }
+
+        if (!id.equals(car.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID in path and ID in body do not match");
+        }
+
+        if (this.carService.findById(id) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found");
+        }
 
         Car updatedCar = this.carService.save(car);
 
@@ -120,8 +127,7 @@ class CarController {
      * @return response that the related vehicle is no longer in the system
      */
     @DeleteMapping("/{id}")
-    ResponseEntity<?> delete(@PathVariable Long id) {
-
+    ResponseEntity<ResponseEntity<Car>> delete(@PathVariable Long id) {
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID cannot be null");
         }

@@ -41,7 +41,7 @@ public class PricingClient {
             Price price = restClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path(pricingService.getUri().toString() + "/api/price")
+                            .path(pricingService.getUri().toString() + "/services/priceOf")
                             .queryParam("vehicleId", vehicleId)
                             .build()
                     )

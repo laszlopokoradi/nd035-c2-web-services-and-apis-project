@@ -8,8 +8,6 @@ import org.springframework.stereotype.*;
 
 import java.util.*;
 
-;
-
 /**
  * Implements the car service create, read, update or delete
  * information about vehicles, as well as gather related
@@ -37,12 +35,8 @@ public class CarService {
         List<Car> allCars = repository.findAll();
 
         for (Car car : allCars) {
-            String price = this.pricingClient.getPrice(car.getId());
-            car.setPrice(price);
-
-            Location location = car.getLocation();
-            car.setLocation(location);
-            // Note: The Location class file also uses @transient for the address, meaning the Maps service needs to be called each time for the address.
+            collectPriceOf(car);
+            collectAddressOf(car);
         }
 
         return allCars;
@@ -55,15 +49,15 @@ public class CarService {
      * @return the requested car's information, including location and price
      */
     public Car findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+
         Car car = this.repository.findById(id)
                 .orElseThrow(CarNotFoundException::new);
 
-        String price = this.pricingClient.getPrice(car.getId());
-        car.setPrice(price);
-
-        Location location = car.getLocation();
-        car.setLocation(location);
-        // Note: The Location class file also uses @transient for the address, meaning the Maps service needs to be called each time for the address.
+        collectPriceOf(car);
+        collectAddressOf(car);
 
         return car;
     }
@@ -79,20 +73,12 @@ public class CarService {
             throw new IllegalArgumentException("Car cannot be null");
         }
 
-        if (car.getId() == null) {
-            // The car is new, so we need to set the price
-        }
+        Car savedCar = this.repository.save(car);
 
-        if (car.getId() != null) {
-            return repository.findById(car.getId())
-                    .map(carToBeUpdated -> {
-                        carToBeUpdated.setDetails(car.getDetails());
-                        carToBeUpdated.setLocation(car.getLocation());
-                        return repository.save(carToBeUpdated);
-                    }).orElseThrow(CarNotFoundException::new);
-        }
+        this.collectPriceOf(savedCar);
+        this.collectAddressOf(savedCar);
 
-        return repository.save(car);
+        return savedCar;
     }
 
     /**
@@ -101,11 +87,33 @@ public class CarService {
      * @param id the ID number of the car to delete
      */
     public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+
         this.repository.findById(id)
                 .orElseThrow(CarNotFoundException::new);
 
         this.pricingClient.deletePriceOfCar(id);
 
         this.repository.deleteById(id);
+    }
+
+    private void collectPriceOf(Car car) {
+        if (car == null || car.getId() == null) {
+            throw new IllegalArgumentException("Car or Car ID cannot be null");
+        }
+
+        String price = this.pricingClient.getPrice(car.getId());
+        car.setPrice(price);
+    }
+
+    private void collectAddressOf(Car car) {
+        if (car == null || car.getLocation() == null) {
+            throw new IllegalArgumentException("Car or Car location cannot be null");
+        }
+
+        Location locationWithAddress = this.mapsClient.getAddress(car.getLocation());
+        car.setLocation(locationWithAddress);
     }
 }

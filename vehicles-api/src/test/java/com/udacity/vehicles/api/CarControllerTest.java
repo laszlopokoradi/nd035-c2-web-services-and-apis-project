@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
-public class CarControllerTest {
+class CarControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -53,7 +53,7 @@ public class CarControllerTest {
      * Creates pre-requisites for testing, such as an example car.
      */
     @BeforeEach
-    public void setup() {
+    void setup() {
         Car car = getCar();
         car.setId(1L);
         given(carService.save(any())).willReturn(car);
@@ -67,7 +67,7 @@ public class CarControllerTest {
      * @throws Exception when car creation fails in the system
      */
     @Test
-    public void createCar()
+    void createCar()
             throws Exception {
         Car car = getCar();
         mvc.perform(post(new URI("/cars")).content(json.write(car)
@@ -83,7 +83,7 @@ public class CarControllerTest {
      * @throws Exception if the read operation of the vehicle list fails
      */
     @Test
-    public void listCars()
+    void listCars()
             throws Exception {
         Car car = getCar();
 
@@ -93,12 +93,6 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mvc.perform(post(new URI("/cars")).content(json.write(car)
-                                                       .getJson())
-                                          .contentType(MediaType.APPLICATION_JSON)
-                                          .accept(MediaType.APPLICATION_JSON))
-           .andExpect(status().isCreated());
-
         mvc.perform(get(new URI("/cars")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.carList[0].details.manufacturer.name").value("Chevrolet"))
@@ -106,13 +100,6 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$._embedded.carList[0].condition").value(Condition.USED.toString()))
                 .andExpect(jsonPath("$._embedded.carList[0].location.lat").value(40.730610))
                 .andExpect(jsonPath("$._embedded.carList[0].location.lon").value(-73.935242));
-
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   the whole list of vehicles. This should utilize the car from `getCar()`
-         *   below (the vehicle will be the first in the list).
-         */
-
     }
 
     /**
@@ -121,12 +108,19 @@ public class CarControllerTest {
      * @throws Exception if the read operation for a single car fails
      */
     @Test
-    public void findCar()
+    void findCar()
             throws Exception {
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   a vehicle by ID. This should utilize the car from `getCar()` below.
-         */
+
+        mvc.perform(get(new URI("/cars/1"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.details.manufacturer.name").value("Chevrolet"))
+                .andExpect(jsonPath("$.details.model").value("Impala"))
+                .andExpect(jsonPath("$.condition").value(Condition.USED.toString()))
+                .andExpect(jsonPath("$.location.lat").value(40.730610))
+                .andExpect(jsonPath("$.location.lon").value(-73.935242));
+
     }
 
     /**
@@ -135,15 +129,15 @@ public class CarControllerTest {
      * @throws Exception if the delete operation of a vehicle fails
      */
     @Test
-    public void deleteCar()
+    void deleteCar()
             throws Exception {
         Car car = getCar();
 
         mvc.perform(post(new URI("/cars")).content(json.write(car)
-                                                       .getJson())
-                                          .contentType(MediaType.APPLICATION_JSON)
-                                          .accept(MediaType.APPLICATION_JSON))
-           .andExpect(status().isCreated());
+                                .getJson())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
 
         mvc.perform(delete(new URI("/cars/1"))
                         .contentType(MediaType.APPLICATION_JSON)

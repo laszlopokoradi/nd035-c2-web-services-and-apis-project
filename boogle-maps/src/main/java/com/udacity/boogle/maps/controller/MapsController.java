@@ -15,7 +15,7 @@ public class MapsController {
         this.addressService = addressService;
     }
 
-    @GetMapping
+    @GetMapping("/address")
     public Address get(@RequestParam Double lat, @RequestParam Double lon) {
         Location location = this.locationService.getLocation(lat, lon);
         String address;
