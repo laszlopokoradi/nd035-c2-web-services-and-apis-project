@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest
+@SpringBootTest(properties = "eureka.client.enabled=false")
 @AutoConfigureMockMvc
 class BoogleMapsApplicationTests {
     @Autowired
@@ -28,13 +28,13 @@ class BoogleMapsApplicationTests {
     void testGetAddressOnce() {
         Address address = null;
         try {
-            String addressJson = mockMvc.perform(get("/maps")
-                                                .param("lat", "37.7749")
-                                                .param("lon", "-122.4194"))
-                                        .andExpect(status().isOk())
-                                        .andReturn()
-                                        .getResponse()
-                                        .getContentAsString();
+            String addressJson = mockMvc.perform(get("/maps/address")
+                            .param("lat", "37.7749")
+                            .param("lon", "-122.4194"))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
             address = new ObjectMapper().readValue(addressJson, Address.class);
 
         } catch (Exception e) {
@@ -54,21 +54,21 @@ class BoogleMapsApplicationTests {
         String firstResultJson = null;
         String secondResultJson = null;
         try {
-            firstResultJson = mockMvc.perform(get("/maps")
-                                             .param("lat", "47.7749")
-                                             .param("lon", "122.4194"))
-                                     .andExpect(status().isOk())
-                                     .andReturn()
-                                     .getResponse()
-                                     .getContentAsString();
+            firstResultJson = mockMvc.perform(get("/maps/address")
+                            .param("lat", "47.7749")
+                            .param("lon", "122.4194"))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
 
-            secondResultJson = mockMvc.perform(get("/maps")
-                                              .param("lat", "47.7749")
-                                              .param("lon", "122.4194"))
-                                      .andExpect(status().isOk())
-                                      .andReturn()
-                                      .getResponse()
-                                      .getContentAsString();
+            secondResultJson = mockMvc.perform(get("/maps/address")
+                            .param("lat", "47.7749")
+                            .param("lon", "122.4194"))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
         } catch (Exception e) {
             e.printStackTrace();
         }

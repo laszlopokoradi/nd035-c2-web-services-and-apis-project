@@ -42,7 +42,7 @@ public class MapsClient {
             Address address = this.restClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path(boogleMapsService.getUri().toString() + "/maps/")
+                            .path(boogleMapsService.getUri().toString() + "/maps/address")
                             .queryParam("lat", location.getLat())
                             .queryParam("lon", location.getLon())
                             .build()
