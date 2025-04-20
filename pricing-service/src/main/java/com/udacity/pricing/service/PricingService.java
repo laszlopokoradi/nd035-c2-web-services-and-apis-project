@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 public class PricingService {
     private final PriceRepository priceRepository;
 
-    private final String[] CURRENCIES = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SEK", "NZD", "MXN"};
+    private static final String[] CURRENCIES = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SEK", "NZD", "MXN"};
 
     public PricingService(PriceRepository priceRepository) {
         this.priceRepository = priceRepository;
@@ -51,8 +51,8 @@ public class PricingService {
      * @return random price for a vehicle
      */
     private BigDecimal randomPrice() {
-        return new BigDecimal(ThreadLocalRandom.current().nextDouble(1, 5))
-                .multiply(new BigDecimal(50000d)).setScale(2, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(1, 5))
+                .multiply(BigDecimal.valueOf(50000d)).setScale(2, RoundingMode.HALF_UP);
     }
 
 }

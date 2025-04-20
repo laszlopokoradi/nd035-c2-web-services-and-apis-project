@@ -1,14 +1,13 @@
 package com.udacity.eureka;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.*;
+import org.springframework.boot.test.context.*;
 
 @SpringBootTest
-public class EurekaApplicationTests {
+class EurekaApplicationTests {
 
-	@Test
-	public void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
