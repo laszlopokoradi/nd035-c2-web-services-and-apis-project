@@ -1,13 +1,8 @@
 package com.udacity.boogle.maps.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
 
 @Entity
-@Accessors(chain = true)
-@Getter
-@Setter
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -22,4 +17,40 @@ public class Location {
 
     @Column(nullable = false)
     private String address;
+
+    public Long getId() {
+        return id;
+    }
+
+    public Location setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Location setLatitude(Double latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public Location setLongitude(Double longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public Location setAddress(String address) {
+        this.address = address;
+        return this;
+    }
 }
